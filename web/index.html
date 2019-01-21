@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    html, body {
+                        overflow: hidden;
+                        width: 100%;
+                        height: 100%;
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    #renderCanvas {
+                        width: 100%;
+                        height: 100%;
+                        touch-action: none;
+                    }
+                </style>
+                <script src="JS/babylon.js" type="text/javascript"></script>
+                </head>
+                <body style="text-align: center">
+                    <canvas id="renderCanvas" touch-action="none" style="width: 200px;height: 200px"></canvas> //touch-action="none" for best results from PEP
+
+                    <script>
+                        var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
+                        var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+
+                        /******* Add the create scene function ******/
+                        var createScene = function () {
+
+                            // create a basic BJS Scene object
+                            var scene = new BABYLON.Scene(engine);
+                            
+                            scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+                            // loader
+                            var loader = new BABYLON.AssetsManager(scene);
+
+                            // light
+                            var light0 = new BABYLON.HemisphericLight("Hemi0", new BABYLON.Vector3(0, 1, 0), scene);
+
+                            light0.specular = new BABYLON.Color3(0, 0, 0);
+
+                            // cam
+                            var cam = new BABYLON.ArcRotateCamera("ArcRotateCamera", Math.PI / 2, 1.2, 80, new BABYLON.Vector3(0, 3, 0), scene);
+                            cam.attachControl(canvas);
+                            cam.applyGravity = true;
+                            cam.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+
+                            // D:/Java/NetbeensProjects/BabylonVRProofConcept/web/Demos/interior-lighting-euclidation-obj/interior-lighting-euclidation.obj
+                            var box = loader.addMeshTask("box", "", "/BabylonVRProofConcept/Demos/interior-lighting-euclidation-obj/", "interior-lighting-euclidation.obj");
+
+                            // Default Environment
+                            /*var environment = scene.createDefaultEnvironment({enableGroundShadow: true, groundYBias: 1});
+                            environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));*/
+
+                            // Enable VR
+                            var vrHelper = scene.createDefaultVRExperience({createDeviceOrientationCamera: false});
+                            vrHelper.enableTeleportation({floorMeshes: [environment.ground]});
+
+                            loader.onFinish = function (tasks) {
+                                console.log(scene.meshes.length);
+
+                                engine.runRenderLoop(function () {
+                                    scene.render();
+                                });
+                            };
+
+                            loader.load();
+
+                            return scene;
+
+                        };
+                        /******* End of the create scene function ******/
+
+                        var scene = createScene(); //Call the createScene function
+
+
+
+                        // Watch for browser/canvas resize events
+                        window.addEventListener("resize", function () {
+                            engine.resize();
+                        });
+                    </script>
+                </body>
+                </html>
